@@ -12,21 +12,26 @@ namespace GodotNUnitRunner
     {
         private FrameworkController _nunit;
 
-        private Node _refreshButton;
+        private Button _refreshButton;
+        private Tree _resultTree;
 
         public override void _Ready()
         {
             InitializeNUnitIfNeeded();
 
-            // Connect buttons
-            _refreshButton = FindNode("RefreshButton");
+            // Connect controls
+            _refreshButton = (Button)FindNode("RefreshButton");
             _refreshButton.Connect("pressed", this, nameof(RefreshButton_Click));
+
+            _resultTree = (Tree)FindNode("ResultTree");
         }
 
         private void InitializeNUnitIfNeeded()
         {
             if (_nunit != null)
                 return;
+
+            GD.Print("Initializing NUnit");
 
             _nunit = new FrameworkController(
                 Assembly.GetExecutingAssembly(),
@@ -41,25 +46,21 @@ namespace GodotNUnitRunner
             InitializeNUnitIfNeeded();
 
             var rootTest = _nunit.Runner.ExploreTests(new MatchEverythingTestFilter());
-            PrintTest(rootTest);
+            DisplayTests(rootTest);
         }
 
-        private void PrintTest(ITest test, int indentLevel = 0)
+        private void DisplayTests(ITest rootTest)
         {
-            Print($"* {test.Name}");
+            _resultTree.Clear();
+            DisplayTestsRecursive(rootTest);
 
-            foreach (var childTest in test.Tests)
-                PrintTest(childTest, indentLevel + 1);
-
-            void Print(string msg)
+            void DisplayTestsRecursive(ITest test, TreeItem parentTree = null)
             {
-                var builder = new System.Text.StringBuilder();
+                var treeItem = _resultTree.CreateItem(parentTree);
+                treeItem.SetText(0, test.Name);
 
-                for (int i = 0; i < indentLevel; i++)
-                    builder.Append("  ");
-                
-                builder.Append(msg);
-                GD.Print(builder.ToString());
+                foreach (var childTest in test.Tests)
+                    DisplayTestsRecursive(childTest, treeItem);
             }
         }
     }

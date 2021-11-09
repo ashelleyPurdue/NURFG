@@ -25,7 +25,8 @@ margin_right = 100.0
 margin_bottom = 20.0
 text = "Run"
 
-[node name="TestList" type="Tree" parent="."]
+[node name="ResultTree" type="Tree" parent="."]
 margin_top = 24.0
 margin_right = 100.0
-margin_bottom = 25.0
+margin_bottom = 40.0
+size_flags_vertical = 3
