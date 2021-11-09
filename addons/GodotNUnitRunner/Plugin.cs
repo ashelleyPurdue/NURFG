@@ -7,6 +7,7 @@ namespace GodotNUnitRunner
     public class Plugin : EditorPlugin
     {
         private Control _dock;
+        private Button _refreshButton;
 
         public override void _EnterTree()
         {
