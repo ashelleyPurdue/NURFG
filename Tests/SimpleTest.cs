@@ -17,5 +17,14 @@ namespace GodotNUnitRunner.Tests
         {
             System.Threading.Thread.Sleep(5000);
         }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        public void This_Test_Has_Multiple_Cases(int caseNum)
+        {
+            Assert.Pass();
+        }
     }
 }
