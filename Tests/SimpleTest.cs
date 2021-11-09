@@ -11,5 +11,11 @@ namespace GodotNUnitRunner.Tests
         {
             Assert.AreEqual(4, 2 + 2);
         }
+
+        [Test]
+        public void This_Test_Takes_A_Long_Time()
+        {
+            System.Threading.Thread.Sleep(5000);
+        }
     }
 }
