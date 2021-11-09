@@ -12,6 +12,9 @@ namespace GodotNUnitRunner
     {
         private FrameworkController _nunit;
 
+        private Dictionary<ITest, TreeItem> _testTreeItems = new Dictionary<ITest, TreeItem>();
+        private Dictionary<ITest, ITestResult> _testResults = new Dictionary<ITest, ITestResult>();
+
         private Button _refreshButton;
         private Button _runButton;
         private Tree _resultTree;
@@ -55,22 +58,27 @@ namespace GodotNUnitRunner
 
         private void RefreshButton_Click()
         {
-            InitializeNUnitIfNeeded();
-
-            var rootTest = _nunit.Runner.ExploreTests(new MatchEverythingTestFilter());
-            DisplayTests(rootTest);
         }
 
         private void RunButton_Click()
         {
+            _testTreeItems.Clear();
+            _resultTree.Clear();
+
             var testFilter = new MatchEverythingTestFilter();
             var testListener = new LambdaListener
             {
-                TestFinishedCallback = result =>
+                TestStartedCallback = (test) =>
                 {
-                    if (_nunit.Runner.Result == null)
-                        return;
-                    DisplayResults(_nunit.Runner.Result);
+                    CreateTreeItemForTest(test);
+                    _testResults[test] = null;
+                    UpdateTestTreeItem(test);
+                },
+
+                TestFinishedCallback = (result) =>
+                {
+                    _testResults[result.Test] = result;
+                    UpdateTestTreeItem(result.Test);
                 }
             };
 
@@ -88,34 +96,41 @@ namespace GodotNUnitRunner
             _runButton.Disabled = disabled;
         }
 
-        private void DisplayTests(ITest rootTest)
+        private void UpdateTestTreeItem(ITest test)
         {
-            _resultTree.Clear();
-            DisplayTestsRecursive(rootTest);
+            var treeItem = _testTreeItems[test];
 
-            void DisplayTestsRecursive(ITest test, TreeItem parentTree = null)
+            if (!_testResults.ContainsKey(test))
             {
-                var treeItem = _resultTree.CreateItem(parentTree);
-                treeItem.SetText(0, test.Name);
-
-                foreach (var childTest in test.Tests)
-                    DisplayTestsRecursive(childTest, treeItem);
+                treeItem.SetText(0, $"(???){test.Name}");
+            }
+            else if (_testResults[test] == null)
+            {
+                treeItem.SetText(0, $"(Running...){test.Name}");
+            }
+            else
+            {
+                var resultState = _testResults[test].ResultState;
+                treeItem.SetText(0, $"({resultState}){test.Name}");
             }
         }
 
-        private void DisplayResults(ITestResult rootTest)
+        private void CreateTreeItemForTest(ITest test)
         {
-            _resultTree.Clear();
-            DisplayResultsRecursive(rootTest);
+            if (_testTreeItems.ContainsKey(test))
+                return;
+            
+            // Create a tree item for this test
+            var parentTreeItem = test.Parent == null
+                ? null
+                : _testTreeItems[test.Parent];
+                    
+            var treeItem = _resultTree.CreateItem(parentTreeItem);
+            _testTreeItems[test] = treeItem;
 
-            void DisplayResultsRecursive(ITestResult test, TreeItem parentTree = null)
-            {
-                var treeItem = _resultTree.CreateItem(parentTree);
-                treeItem.SetText(0, $"({test.ResultState}){test.Name}");
-
-                foreach (var childTest in test.Children)
-                    DisplayResultsRecursive(childTest, treeItem);
-            }
+            // Create tree items for all child tests
+            foreach (var child in test.Tests)
+                CreateTreeItemForTest(child);
         }
     }
 
