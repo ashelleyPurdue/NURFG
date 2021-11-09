@@ -109,16 +109,29 @@ namespace GodotNUnitRunner
 
             if (!_testResults.ContainsKey(test))
             {
-                treeItem.SetText(0, $"(???){test.Name}");
+                treeItem.SetText(0, $"? {test.Name}");
             }
             else if (_testResults[test] == null)
             {
-                treeItem.SetText(0, $"(Running...){test.Name}");
+                treeItem.SetText(0, $"(...) {test.Name}");
             }
             else
             {
-                var resultState = _testResults[test].ResultState;
-                treeItem.SetText(0, $"({resultState}){test.Name}");
+                var status = _testResults[test].ResultState.Status;
+                treeItem.SetText(0, $"{GetStatusIcon(status)} {test.Name}");
+            }
+        }
+
+        private string GetStatusIcon(TestStatus status)
+        {
+            switch (status)
+            {
+                case TestStatus.Passed: return "✔";
+                case TestStatus.Failed: return "[FAILED]";
+                case TestStatus.Inconclusive: return "?";
+                case TestStatus.Warning: return "[WARN]";
+                
+                default: return status.ToString();
             }
         }
 

@@ -8,9 +8,21 @@ namespace GodotNUnitRunner.Tests
     public class SimpleTest
     {
         [Test]
-        public void Two_Plus_Two_Equals_Four()
+        public void This_Test_Passes()
         {
             Assert.AreEqual(4, 2 + 2);
+        }
+
+        [Test]
+        public void This_Test_Is_Supposed_To_Fail()
+        {
+            Assert.Fail();
+        }
+
+        [Test]
+        public void This_Test_Has_A_Warning()
+        {
+            Assert.Warn("Warning: this message contains trace amounts of humor.");
         }
 
         [Test]
@@ -37,6 +49,13 @@ namespace GodotNUnitRunner.Tests
         {
             for (int i = 0; i < 4; i++)
                 yield return new object[] { i };
+        }
+
+        [Test]
+        public void This_Test_Uses_Godot_Classes()
+        {
+            var node = new Node2D();
+            node._Process(1337);
         }
     }
 }
