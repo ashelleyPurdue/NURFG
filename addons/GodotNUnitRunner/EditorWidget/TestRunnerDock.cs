@@ -58,6 +58,13 @@ namespace GodotNUnitRunner
 
         private void RefreshButton_Click()
         {
+            _testTreeItems.Clear();
+            _resultTree.Clear();
+            
+            CreateTreeItemForTest(_nunit.Runner.LoadedTest);
+
+            foreach (var test in _testTreeItems.Keys)
+                UpdateTestTreeItem(test);
         }
 
         private void RunButton_Click()
