@@ -69,8 +69,8 @@ namespace GodotNUnitRunner
 
         private void RunButton_Click()
         {
-            _testTreeItems.Clear();
-            _resultTree.Clear();
+            _testResults.Clear();
+            RefreshButton_Click();
 
             var testFilter = new MatchEverythingTestFilter();
             var testListener = new LambdaListener
