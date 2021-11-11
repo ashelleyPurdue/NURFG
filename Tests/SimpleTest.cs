@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace GodotNUnitRunner.Tests
+namespace NURFG.Tests
 {
     public class SimpleTest
     {

@@ -1,6 +1,6 @@
 using NUnit.Framework.Interfaces;
 
-namespace GodotNUnitRunner
+namespace NURFG
 {
     public class MatchEverythingTestFilter : ITestFilter
     {

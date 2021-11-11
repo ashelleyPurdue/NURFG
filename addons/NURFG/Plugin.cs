@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace GodotNUnitRunner
+namespace NURFG
 {
     [Tool]
     public class Plugin : EditorPlugin
@@ -11,7 +11,7 @@ namespace GodotNUnitRunner
 
         public override void _EnterTree()
         {
-            _dock = (Control)GD.Load<PackedScene>("addons/GodotNUnitRunner/EditorWidget/TestRunnerDock.tscn").Instance();
+            _dock = (Control)GD.Load<PackedScene>("addons/NURFG/EditorWidget/TestRunnerDock.tscn").Instance();
             AddControlToDock(DockSlot.LeftUl, _dock);
         }
 

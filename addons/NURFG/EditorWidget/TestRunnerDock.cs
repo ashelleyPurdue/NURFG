@@ -6,7 +6,7 @@ using Godot;
 using NUnit.Framework.Api;
 using NUnit.Framework.Interfaces;
 
-namespace GodotNUnitRunner
+namespace NURFG
 {
     [Tool]
     public class TestRunnerDock : Control

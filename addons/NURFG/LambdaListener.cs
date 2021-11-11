@@ -1,7 +1,7 @@
 using System;
 using NUnit.Framework.Interfaces;
 
-namespace GodotNUnitRunner
+namespace NURFG
 {
     public class LambdaListener : ITestListener
     {
