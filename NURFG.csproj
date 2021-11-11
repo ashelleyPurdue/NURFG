@@ -5,4 +5,8 @@
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.13.2" />
   </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'!='DEBUG'">
+    <Compile Remove="Tests\**" />
+    <EmbeddedResource Remove="Tests\**" />
+  </ItemGroup>
 </Project>
