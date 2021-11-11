@@ -34,6 +34,7 @@ namespace GodotNUnitRunner
 
             _resultTree = (Tree)FindNode("ResultTree");
             _resultTree.Connect("item_selected", this, nameof(TestResultTree_ItemSelected));
+            _resultTree.Connect("item_activated", this, nameof(TestResultTree_ItemActivated));
 
             _testOutputLabel = (RichTextLabel)FindNode("TestOutputLabel");
         }
@@ -76,8 +77,29 @@ namespace GodotNUnitRunner
         {
             _testResults.Clear();
             RefreshButton_Click();
+            StartTestRun(new MatchEverythingTestFilter());
+        }
 
-            var testFilter = new MatchEverythingTestFilter();
+        private void TestResultTree_ItemSelected()
+        {
+            var selectedItem = _resultTree.GetSelected();
+            ITest selectedTest = GetTestFromTreeItem(selectedItem);
+            DisplayTestOutput(selectedTest);
+        }
+
+        private void TestResultTree_ItemActivated()
+        {
+            if (_nunit.Runner.IsTestRunning)
+                return;
+            
+            // Run the selected test
+            var selectedItem = _resultTree.GetSelected();
+            ITest selectedTest = GetTestFromTreeItem(selectedItem);
+            StartTestRun(new MatchSpecificTestFilter(selectedTest));
+        }
+
+        private void StartTestRun(ITestFilter filter)
+        {
             var testListener = new LambdaListener
             {
                 TestStartedCallback = (test) =>
@@ -94,14 +116,7 @@ namespace GodotNUnitRunner
                 }
             };
 
-            _nunit.Runner.RunAsync(testListener, testFilter);
-        }
-
-        private void TestResultTree_ItemSelected()
-        {
-            var selectedItem = _resultTree.GetSelected();
-            ITest selectedTest = GetTestFromTreeItem(selectedItem);
-            DisplayTestOutput(selectedTest);
+            _nunit.Runner.RunAsync(testListener, filter);
         }
 
         private void EnableButtons(bool enabled)
