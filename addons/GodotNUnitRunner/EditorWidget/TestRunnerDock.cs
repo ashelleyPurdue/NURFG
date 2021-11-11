@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using Godot;
@@ -18,6 +19,7 @@ namespace GodotNUnitRunner
         private Button _refreshButton;
         private Button _runButton;
         private Tree _resultTree;
+        private RichTextLabel _testOutputLabel;
 
         public override void _Ready()
         {
@@ -31,6 +33,9 @@ namespace GodotNUnitRunner
             _runButton.Connect("pressed", this, nameof(RunButton_Click));
 
             _resultTree = (Tree)FindNode("ResultTree");
+            _resultTree.Connect("item_selected", this, nameof(TestResultTree_ItemSelected));
+
+            _testOutputLabel = (RichTextLabel)FindNode("TestOutputLabel");
         }
 
         public override void _Process(float delta)
@@ -92,6 +97,13 @@ namespace GodotNUnitRunner
             _nunit.Runner.RunAsync(testListener, testFilter);
         }
 
+        private void TestResultTree_ItemSelected()
+        {
+            var selectedItem = _resultTree.GetSelected();
+            ITest selectedTest = GetTestFromTreeItem(selectedItem);
+            DisplayTestOutput(selectedTest);
+        }
+
         private void EnableButtons(bool enabled)
         {
             // Instead of an "Enabled" property, Godot uses a "Disabled"
@@ -135,6 +147,43 @@ namespace GodotNUnitRunner
             }
         }
 
+        private void DisplayTestOutput(ITest test)
+        {
+            if (test == null)
+            {
+                _testOutputLabel.Text = "";
+                return;
+            }
+
+            if (!_testResults.ContainsKey(test))
+            {
+                _testOutputLabel.Text = "Test not run.";
+                return;
+            }
+
+            if (_testResults[test] == null)
+            {
+                _testOutputLabel.Text = "Test in progress...";
+                return;
+            }
+
+            var builder = new System.Text.StringBuilder();
+            var testResult = _testResults[test];
+
+            builder.AppendLine(testResult.Name);
+            PrintIfNotEmpty(testResult.Message);
+            PrintIfNotEmpty(testResult.Output);
+            PrintIfNotEmpty(testResult.StackTrace);
+
+            _testOutputLabel.Text = builder.ToString();
+
+            void PrintIfNotEmpty(string msg)
+            {
+                if (!string.IsNullOrWhiteSpace(msg))
+                    builder.AppendLine(msg);
+            }
+        }
+
         private void CreateTreeItemForTest(ITest test)
         {
             if (_testTreeItems.ContainsKey(test))
@@ -151,6 +200,14 @@ namespace GodotNUnitRunner
             // Create tree items for all child tests
             foreach (var child in test.Tests)
                 CreateTreeItemForTest(child);
+        }
+    
+        private ITest GetTestFromTreeItem(TreeItem treeItem)
+        {
+            return _testTreeItems
+                .Where(kvp => kvp.Value == treeItem)
+                .Select(kvp => kvp.Key)
+                .FirstOrDefault();
         }
     }
 

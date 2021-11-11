@@ -52,6 +52,12 @@ namespace GodotNUnitRunner.Tests
         }
 
         [Test]
+        public void This_Test_Write_To_Console()
+        {
+            Console.WriteLine("Hello world!");
+        }
+
+        [Test]
         public void This_Test_Uses_Godot_Classes()
         {
             var node = new Node2D();
