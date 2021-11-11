@@ -134,6 +134,10 @@ namespace GodotNUnitRunner
         {
             var treeItem = _testTreeItems[test];
             treeItem.SetText(0, GetTestLabel(test));
+
+            // Recursively update all ancestor items
+            if (test.Parent != null)
+                UpdateTestTreeItem(test.Parent);
         }
 
         private string GetTestLabel(ITest test)
@@ -214,6 +218,7 @@ namespace GodotNUnitRunner
                 default: return $"[{state.ToString().ToUpper()}]";
             }
         }
+
 
         private void DisplayTestOutput(ITest test)
         {
