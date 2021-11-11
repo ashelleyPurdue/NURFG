@@ -11,19 +11,30 @@ namespace GodotNUnitRunner
         public bool Pass(ITest test) => true;
     }
 
-    public class MatchSpecificTestFilter : ITestFilter
+    public class MatchDescendantsOfFilter : ITestFilter
     {
-        private readonly ITest _test;
+        private readonly ITest _possibleParent;
 
-        public MatchSpecificTestFilter(ITest test)
+        public MatchDescendantsOfFilter(ITest test)
         {
-            _test = test;
+            _possibleParent = test;
         }
 
         public TNode AddToXml(TNode parentNode, bool recursive) => null;
         public TNode ToXml(bool recursive) => null;
 
-        public bool IsExplicitMatch(ITest test) => test == _test;
-        public bool Pass(ITest test) => test == _test;
+        public bool IsExplicitMatch(ITest test) => IsDescendantOf(_possibleParent, test);
+        public bool Pass(ITest test) => IsDescendantOf(_possibleParent, test);
+
+        private bool IsDescendantOf(ITest possibleParent, ITest possibleChild)
+        {
+            if (possibleChild == possibleParent)
+                return true;
+            
+            if (possibleChild.Parent == null)
+                return false;
+
+            return IsDescendantOf(possibleParent, possibleChild.Parent);
+        }
     }
 }

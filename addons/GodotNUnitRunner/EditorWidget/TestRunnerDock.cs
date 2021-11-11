@@ -90,13 +90,10 @@ namespace GodotNUnitRunner
 
         private void TestResultTree_ItemActivated()
         {
-            if (_nunit.Runner.IsTestRunning)
-                return;
-            
             // Run the selected test
             var selectedItem = _resultTree.GetSelected();
             ITest selectedTest = GetTestFromTreeItem(selectedItem);
-            StartTestRun(new MatchSpecificTestFilter(selectedTest));
+            StartTestRun(new MatchDescendantsOfFilter(selectedTest));
         }
 
 
