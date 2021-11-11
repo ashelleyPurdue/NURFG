@@ -62,6 +62,7 @@ namespace GodotNUnitRunner
             _nunit.LoadTests();
         }
 
+
         private void RefreshButton_Click()
         {
             _testTreeItems.Clear();
@@ -98,6 +99,7 @@ namespace GodotNUnitRunner
             StartTestRun(new MatchSpecificTestFilter(selectedTest));
         }
 
+
         private void StartTestRun(ITestFilter filter)
         {
             var testListener = new LambdaListener
@@ -130,35 +132,89 @@ namespace GodotNUnitRunner
             _runButton.Disabled = disabled;
         }
 
+
         private void UpdateTestTreeItem(ITest test)
         {
             var treeItem = _testTreeItems[test];
-
-            if (!_testResults.ContainsKey(test))
-            {
-                treeItem.SetText(0, $"? {test.Name}");
-            }
-            else if (_testResults[test] == null)
-            {
-                treeItem.SetText(0, $"(...) {test.Name}");
-            }
-            else
-            {
-                var status = _testResults[test].ResultState.Status;
-                treeItem.SetText(0, $"{GetStatusIcon(status)} {test.Name}");
-            }
+            treeItem.SetText(0, GetTestLabel(test));
         }
 
-        private string GetStatusIcon(TestStatus status)
+        private string GetTestLabel(ITest test)
         {
-            switch (status)
+            var state = GetTestState(test);
+            return $"{TestStateToIcon(state)} {test.Name}";
+        }
+
+        /// <summary>
+        /// Gets a value corresponding to the "icon" that should be displayed
+        /// next to a test's name
+        /// 
+        /// If there are children, it examines the results of all of them and
+        /// returns the "worst" of them.
+        /// </summary>
+        /// <param name="test"></param>
+        /// <returns></returns>
+        private TestState GetTestState(ITest test)
+        {
+            // Recursive case: find the worst of the children.
+            if (test.HasChildren)
             {
-                case TestStatus.Passed: return "✔";
-                case TestStatus.Failed: return "[FAILED]";
-                case TestStatus.Inconclusive: return "?";
-                case TestStatus.Warning: return "[WARN]";
+                var worstState = TestState.Passed;
+
+                foreach (var child in test.Tests)
+                {
+                    var childState = GetTestState(child);
+                    if (childState < worstState)
+                        worstState = childState;
+                }
+
+                return worstState;
+            }
+
+            // Tests that haven't been run do not have an entry in _testResults.
+            if (!_testResults.ContainsKey(test))
+                return TestState.NotRun;
+            
+            // Tests that are in progress have a null entry in _testResults
+            else if (_testResults[test] == null)
+                return TestState.InProgress;
+
+            // All others are self-explanatory.
+            switch (_testResults[test].ResultState.Status)
+            {
+                case TestStatus.Failed: return TestState.Failed;
+                case TestStatus.Inconclusive: return TestState.Inconclusive;
+                case TestStatus.Passed: return TestState.Passed;
+                case TestStatus.Skipped: return TestState.Skipped;
+                case TestStatus.Warning: return TestState.Warning;
+            }
+
+            throw new Exception("Unexpected TestStatus " + _testResults[test].ResultState.Status);
+        }
+
+        private enum TestState
+        {
+            InProgress = 0,
+            Failed = 1,
+            Warning = 2,
+            Inconclusive = 3,
+            Skipped = 4,
+            NotRun = 5,
+            Passed = 6
+        }
+
+        private string TestStateToIcon(TestState state)
+        {
+            switch (state)
+            {
+                case TestState.NotRun: return "?";
+                case TestState.InProgress: return "(...)";
+                case TestState.Passed: return "✔";
+                case TestState.Failed: return "[FAILED]";
+                case TestState.Inconclusive: return "?";
+                case TestState.Warning: return "[WARN]";
                 
-                default: return status.ToString();
+                default: return $"[{state.ToString().ToUpper()}]";
             }
         }
 
