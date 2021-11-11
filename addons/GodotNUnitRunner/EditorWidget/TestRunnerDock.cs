@@ -76,7 +76,6 @@ namespace GodotNUnitRunner
 
         private void RunButton_Click()
         {
-            _testResults.Clear();
             RefreshButton_Click();
             StartTestRun(new MatchEverythingTestFilter());
         }
@@ -99,6 +98,20 @@ namespace GodotNUnitRunner
 
         private void StartTestRun(ITestFilter filter)
         {
+            // Mark all of the tests matched by the filter as "not run".
+            var testsToClear = _testResults
+                .Keys
+                .Where(test => filter.Pass(test))
+                .ToArray();
+
+            foreach (var test in testsToClear)
+            {
+                _testResults.Remove(test);
+                UpdateTestTreeItem(test);
+            }
+
+            // Whenever a test starts or finishes, update its results and its
+            // tree item.
             var testListener = new LambdaListener
             {
                 TestStartedCallback = (test) =>
@@ -115,6 +128,7 @@ namespace GodotNUnitRunner
                 }
             };
 
+            // Start running the tests in the background.
             _nunit.Runner.RunAsync(testListener, filter);
         }
 
