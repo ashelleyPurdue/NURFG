@@ -1,3 +1,4 @@
+#if TOOLS
 using NUnit.Framework.Interfaces;
 
 namespace NURFG
@@ -38,3 +39,4 @@ namespace NURFG
         }
     }
 }
+#endif

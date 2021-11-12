@@ -1,3 +1,4 @@
+#if TOOLS
 using System;
 using NUnit.Framework.Interfaces;
 
@@ -22,3 +23,4 @@ namespace NURFG
             => TestStartedCallback?.Invoke(test);
     }
 }
+#endif

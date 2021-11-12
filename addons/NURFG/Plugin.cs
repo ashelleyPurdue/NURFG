@@ -1,3 +1,4 @@
+#if TOOLS
 using Godot;
 using System;
 
@@ -26,3 +27,4 @@ namespace NURFG
         }
     }
 }
+#endif

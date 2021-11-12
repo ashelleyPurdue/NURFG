@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
+#if TOOLS
 using Godot;
 using NUnit.Framework.Api;
 using NUnit.Framework.Interfaces;
@@ -299,3 +300,4 @@ namespace NURFG
     }
 
 }
+#endif
