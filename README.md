@@ -3,7 +3,7 @@
 This is an editor plugin for Godot 3.4 mono.  As the name suggests, it locates
 and runs NUnit tests.
 
-![screenshot](screenshot.png "screenshot")
+![screenshot](screenshots/screenshot.png "screenshot")
 
 # The Catch
 As of version 3.4, Godot does not support solutions with multiple .csproj files.
