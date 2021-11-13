@@ -1,8 +1,18 @@
 <Project Sdk="Godot.NET.Sdk/3.3.0">
+
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
-  <ItemGroup>
+
+  <!-- NuGet packages used only by tests belong here -->
+  <ItemGroup Condition="'$(Configuration)'=='DEBUG'">
     <PackageReference Include="NUnit" Version="3.13.2" />
   </ItemGroup>
+
+  <!-- Exclude tests from the release build, so they don't ship with the game. -->
+  <ItemGroup Condition="'$(Configuration)'!='DEBUG'">
+    <Compile Remove="Tests\**" />
+    <EmbeddedResource Remove="Tests\**" />
+  </ItemGroup>
+
 </Project>
