@@ -44,8 +44,6 @@ margin_right = 100.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-bbcode_text = "Woah text!"
-text = "Woah text!"
 __meta__ = {
 "_edit_use_anchors_": false
 }
