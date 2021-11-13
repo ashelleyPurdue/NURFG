@@ -155,7 +155,16 @@ namespace NURFG
         private string GetTestLabel(ITest test)
         {
             var state = GetTestState(test);
-            return $"{TestStateToIcon(state)} {test.Name}";
+            string icon = TestStateToIcon(state);
+
+            if (!test.IsSuite)
+                return $"{icon} {test.Name}";
+            
+            if (!_testResults.ContainsKey(test) || _testResults[test] == null)
+                return $"{icon} {test.Name} ({test.TestCaseCount} found)";
+
+            var result = _testResults[test];
+            return $"{icon} {test.Name} ({result.PassCount} / {test.TestCaseCount} passing)";
         }
 
         /// <summary>
