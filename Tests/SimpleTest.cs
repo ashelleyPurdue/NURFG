@@ -52,7 +52,7 @@ namespace NURFG.Tests
         }
 
         [Test]
-        public void This_Test_Write_To_Console()
+        public void This_Test_Writes_To_Console()
         {
             Console.WriteLine("Hello world!");
         }

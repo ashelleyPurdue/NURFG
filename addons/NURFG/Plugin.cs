@@ -8,12 +8,11 @@ namespace NURFG
     public class Plugin : EditorPlugin
     {
         private Control _dock;
-        private Button _refreshButton;
 
         public override void _EnterTree()
         {
             _dock = (Control)GD.Load<PackedScene>("addons/NURFG/EditorWidget/TestRunnerDock.tscn").Instance();
-            AddControlToDock(DockSlot.LeftUl, _dock);
+            AddControlToDock(DockSlot.RightBl, _dock);
         }
 
         public override void _ExitTree()
