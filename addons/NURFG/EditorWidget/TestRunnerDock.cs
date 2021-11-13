@@ -135,9 +135,6 @@ namespace NURFG
 
         private void EnableButtons(bool enabled)
         {
-            // Instead of an "Enabled" property, Godot uses a "Disabled"
-            // property.  Why?  No clue.
-            // Thanks, Godot!
             bool disabled = !enabled;
 
             _refreshButton.Disabled = disabled;
@@ -261,7 +258,9 @@ namespace NURFG
             builder.AppendLine(testResult.Name);
             PrintIfNotEmpty(testResult.Message);
             PrintIfNotEmpty(testResult.Output);
-            PrintIfNotEmpty(testResult.StackTrace);
+
+            if (testResult.ResultState.Status != TestStatus.Passed)
+                PrintIfNotEmpty(testResult.StackTrace);
 
             _testOutputLabel.Text = builder.ToString();
 
