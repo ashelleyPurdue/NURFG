@@ -10,7 +10,7 @@ using NUnit.Framework.Interfaces;
 namespace NURFG
 {
     [Tool]
-    public class TestRunnerDock : Control
+    public partial class TestRunnerDock : Control
     {
         private FrameworkController _nunit;
 
@@ -27,20 +27,20 @@ namespace NURFG
             InitializeNUnitIfNeeded();
 
             // Connect controls
-            _refreshButton = (Button)FindNode("RefreshButton");
-            _refreshButton.Connect("pressed", this, nameof(RefreshButton_Click));
+            _refreshButton = (Button)GetNode("HBoxContainer/RefreshButton");
+            _refreshButton.Connect("pressed", Callable.From(() => RefreshButton_Click()));
 
-            _runButton = (Button)FindNode("RunButton");
-            _runButton.Connect("pressed", this, nameof(RunButton_Click));
+            _runButton = (Button)GetNode("HBoxContainer/RunButton");
+            _runButton.Connect("pressed", Callable.From(() => RunButton_Click()));
 
-            _resultTree = (Tree)FindNode("ResultTree");
-            _resultTree.Connect("item_selected", this, nameof(TestResultTree_ItemSelected));
-            _resultTree.Connect("item_activated", this, nameof(TestResultTree_ItemActivated));
+            _resultTree = (Tree)GetNode("VSplitContainer/ResultTree");
+            _resultTree.Connect("item_selected", Callable.From(() => TestResultTree_ItemSelected()));
+            _resultTree.Connect("item_activated", Callable.From(() => TestResultTree_ItemActivated()));
 
-            _testOutputLabel = (RichTextLabel)FindNode("TestOutputLabel");
+            _testOutputLabel = (RichTextLabel)GetNode("VSplitContainer/TestOutputLabel");
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             base._Process(delta);
 
@@ -68,7 +68,7 @@ namespace NURFG
         {
             _testTreeItems.Clear();
             _resultTree.Clear();
-            
+
             CreateTreeItemForTest(_nunit.Runner.LoadedTest);
 
             foreach (var test in _testTreeItems.Keys)
@@ -159,7 +159,7 @@ namespace NURFG
 
             if (!test.IsSuite)
                 return $"{icon} {test.Name}";
-            
+
             if (!_testResults.ContainsKey(test) || _testResults[test] == null)
                 return $"{icon} {test.Name} ({test.TestCaseCount} found)";
 
@@ -196,7 +196,7 @@ namespace NURFG
             // Tests that haven't been run do not have an entry in _testResults.
             if (!_testResults.ContainsKey(test))
                 return TestState.NotRun;
-            
+
             // Tests that are in progress have a null entry in _testResults
             else if (_testResults[test] == null)
                 return TestState.InProgress;
@@ -235,7 +235,7 @@ namespace NURFG
                 case TestState.Failed: return "[FAILED]";
                 case TestState.Inconclusive: return "?";
                 case TestState.Warning: return "[WARN]";
-                
+
                 default: return $"[{state.ToString().ToUpper()}]";
             }
         }
@@ -284,12 +284,12 @@ namespace NURFG
         {
             if (_testTreeItems.ContainsKey(test))
                 return;
-            
+
             // Create a tree item for this test
             var parentTreeItem = test.Parent == null
                 ? null
                 : _testTreeItems[test.Parent];
-                    
+
             var treeItem = _resultTree.CreateItem(parentTreeItem);
             _testTreeItems[test] = treeItem;
 
@@ -297,7 +297,7 @@ namespace NURFG
             foreach (var child in test.Tests)
                 CreateTreeItemForTest(child);
         }
-    
+
         private ITest GetTestFromTreeItem(TreeItem treeItem)
         {
             return _testTreeItems
@@ -306,6 +306,5 @@ namespace NURFG
                 .FirstOrDefault();
         }
     }
-
 }
 #endif

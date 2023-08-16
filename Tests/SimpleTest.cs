@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace NURFG.Tests
 {
-    public class SimpleTest
+    public partial class SimpleTest
     {
         [Test]
         public void This_Test_Passes()

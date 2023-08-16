@@ -5,13 +5,13 @@ using System;
 namespace NURFG
 {
     [Tool]
-    public class Plugin : EditorPlugin
+    public partial class Plugin : EditorPlugin
     {
         private Control _dock;
 
         public override void _EnterTree()
         {
-            _dock = (Control)GD.Load<PackedScene>("addons/NURFG/EditorWidget/TestRunnerDock.tscn").Instance();
+            _dock = (Control)GD.Load<PackedScene>("addons/NURFG/EditorWidget/TestRunnerDock.tscn").Instantiate();
             AddControlToDock(DockSlot.RightBl, _dock);
         }
 
